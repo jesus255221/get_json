@@ -22,6 +22,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -48,8 +49,13 @@ public class MainActivity extends AppCompatActivity {
                 @Field("name") String name,
                 @Field("glucose") String glucose
         );
+        @POST("/.json")
+        Call<String> PostArray(
+                @Body List<GlucoseData> data
+        );
         @GET("/users")
         Call<List<UsersResponses>> GetUsersInformations();
+
     }
 
 
@@ -69,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 GetData();
+            }
+        });
+        Button post_button = (Button)findViewById(R.id.post_array);
+        post_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PostArray();
             }
         });
 
@@ -165,5 +178,37 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "NetWorkERROR", Toast.LENGTH_SHORT).show();
             return false;
         }
+    }
+
+    public void PostArray(){
+        GlucoseData David = new GlucoseData();
+        David.setName("David");
+        David.setGlucose(9487);
+        GlucoseData Joseph = new GlucoseData();
+        Joseph.setName("Joseph");
+        Joseph.setGlucose(999);
+        List<GlucoseData> Data = new ArrayList<>();
+        Data.add(David);
+        Data.add(Joseph);
+
+        Retrofit retrofit = new Retrofit
+                .Builder()
+                .baseUrl("https://webduino-d36fa.firebaseio.com")
+                .addConverterFactory(GsonConverterFactory.create()).build();
+        Service service = retrofit.create(Service.class);
+        Call<String> post = service.PostArray(Data);
+        post.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+//                  TextView textView = (TextView)findViewById(R.id.textview);
+//                  textView.setText(response.body().toString());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"POST ARRAY ERROR",Toast.LENGTH_LONG);
+            }
+        });
+
     }
 }
