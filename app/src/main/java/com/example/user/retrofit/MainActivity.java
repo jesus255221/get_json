@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         );
         @GET("/users")
         Call<List<UsersResponses>> GetUsersInformations();
+        @GET("/locations/array")
+        Call<locationsResponse> GetLocations();
 
     }
 
@@ -149,29 +151,39 @@ public class MainActivity extends AppCompatActivity {
         if(isNetworkConnected()){
             Retrofit retrofit = new Retrofit
                     .Builder()
-                    .baseUrl("https://api.github.com")
+                    .baseUrl("http://jia.ee.ncku.edu.tw")
                     .addConverterFactory(GsonConverterFactory.create()).build();
             Service service = retrofit.create(Service.class);
-            Call<List<UsersResponses>> get = service.GetUsersInformations();
-            get.enqueue(new Callback<List<UsersResponses>>() {
+            Call<locationsResponse> get = service.GetLocations();
+            get.enqueue(new Callback<locationsResponse>() {
                 @Override
-                public void onResponse(Call<List<UsersResponses>> call, Response<List<UsersResponses>> response) {
-                    List<String> user = new ArrayList<>();
-                    for(int i = 0;i < response.body().size();i++){
-                        user.add(response.body().get(i).getLogin());
+                public void onResponse(Call<locationsResponse> call, Response<locationsResponse> response) {
+                    ArrayList<Double> longtitude = new ArrayList<>();
+                    for(int i = 0;i < response.body().getLocations().size(); i++){
+                        try {
+                            longtitude.add(response.body().getLocations().get(i).getLongitude());
+                        } catch (Exception e){
+
+                        }
+
                     }
-                    ArrayAdapter<String> adapter =
-                            new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,user);
-                    ListView listview = (ListView)findViewById(R.id.listview);
-                    listview.setAdapter(adapter);
+                    //Toast.makeText(getApplicationContext(),Double.toString(response.body().getLocations().get(4).getLongitude()),Toast.LENGTH_LONG).show();
+                    ArrayAdapter<Double> arrayAdapter = new ArrayAdapter<>(
+                            getApplicationContext(),
+                            android.R.layout.simple_list_item_1,
+                            longtitude
+                    );
+                    ListView listView = (ListView)findViewById(R.id.listview);
+                    listView.setAdapter(arrayAdapter);
                 }
 
                 @Override
-                public void onFailure(Call<List<UsersResponses>> call, Throwable t) {
+                public void onFailure(Call<locationsResponse> call, Throwable t) {
                     TextView textView = (TextView) findViewById(R.id.textview);
                     textView.setText(t.toString());
                 }
             });
+
 
             return true;
         } else{
