@@ -2,6 +2,7 @@ package com.example.user.retrofit;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -86,7 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 PostArray();
             }
         });
-
+        Button map_button = (Button)findViewById(R.id.Map);
+        map_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public boolean PostData(){
@@ -183,8 +191,6 @@ public class MainActivity extends AppCompatActivity {
                     textView.setText(t.toString());
                 }
             });
-
-
             return true;
         } else{
             Toast.makeText(this, "NetWorkERROR", Toast.LENGTH_SHORT).show();
